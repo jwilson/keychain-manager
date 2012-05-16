@@ -13,8 +13,11 @@ class KeychainManager(object):
     def delete(self):
         return '%s delete-keychain %s' % (KC,self.file)
 
+    #TODO: fix 
     def exists(self):
-        return False
+        cmd = '%s list-keychains' % (KC,)
+        result = ''
+        return self.name is in result
 
     def export_identities(self,p12_file):
         return '%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.file,p12_file)
@@ -45,7 +48,7 @@ class KeychainManager(object):
     def generate_rsa_key(rsa_file, keysize=2048):
         return '%s genrsa -out %s %s' % (SSL,rsa_file,keysize)
 
-    #need to actually do the loop properly
+    #TODO: fix
     def keychain_files():
         files = []
         cmd = '%s list-keychains' % (KC,)
