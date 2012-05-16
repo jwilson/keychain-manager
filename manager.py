@@ -16,6 +16,7 @@ class KeychainManager(object):
 
     def delete(self):
         os.system('%s delete-keychain %s' % (KC,self.filename))
+        self.filename = None
 
     def exists(self):
         return self.name in os.popen('%s list-keychains' % (KC,)).read()
@@ -29,8 +30,7 @@ class KeychainManager(object):
         for f in KeychainManager.keychain_files():
             if self.name in f:
                 self.filename = f
-                return self.filename
-        self.filename = None    
+                return self.filename  
 
     #TODO: test
     def import_apple_cert(self,apple_cert_file):
