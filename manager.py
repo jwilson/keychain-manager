@@ -26,12 +26,11 @@ class KeychainManager(object):
     def file(self):
         if self.filename:
             return self.filename
-        files = KeychainManager.keychain_files()
-        for f in files:
+        for f in KeychainManager.keychain_files():
             if self.name in f:
                 self.filename = f
-                continue    
-        return self.filename
+                return self.filename
+        self.filename = None    
 
     #TODO: test
     def import_apple_cert(self,apple_cert_file):
@@ -58,8 +57,4 @@ class KeychainManager(object):
 
     @classmethod
     def keychain_files(cls):
-        files = []
-        results = os.popen('%s list-keychains' % (KC,)).read().split('\n')
-        for f in results:
-            files.append(f.strip().replace('"',''))
-        return files
+        return [f.strip().replace('"','') for f in os.popen('%s list-keychains' % (KC,)).read().split('\n')]
