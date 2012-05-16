@@ -1,58 +1,66 @@
+import os
+import subprocess
+
 KC = 'security'
 SSL = 'openssl'
 
 class KeychainManager(object):
-    file = None
+    filename = None
 
     def __init__(self,name):
         self.name = name
+        self.file()
 
     def create(self):
-        return '%s create-keychain -p "" %s' % (KC,self.name)
+        os.system('%s create-keychain -p "" %s' % (KC,self.name))
+        self.file()
 
     def delete(self):
-        return '%s delete-keychain %s' % (KC,self.file)
+        os.system('%s delete-keychain %s' % (KC,self.filename))
 
-    #TODO: fix 
     def exists(self):
-        cmd = '%s list-keychains' % (KC,)
-        result = ''
-        return self.name in result
+        return self.name in os.popen('%s list-keychains' % (KC,)).read()
 
     def export_identities(self,p12_file):
-        return '%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.file,p12_file)
+        return '%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.filename,p12_file)
 
     def file(self):
-        if self.file:
-            return self.file
+        if self.filename:
+            return self.filename
         files = KeychainManager.keychain_files()
         for f in files:
             if self.name in f:
-                self.file = f
+                self.filename = f
                 continue    
-        return self.file
+        return self.filename
 
+    #TODO: test
     def import_apple_cert(self,apple_cert_file):
-        return '%s import %s -k %s' % (KC,apple_cert_file,self.file)
+        os.system('%s import %s -k %s' % (KC,apple_cert_file,self.filename))
 
+    #TODO: test
     def import_rsa_cert(self,rsa_cert_file):
-        return '%s import %s -P "" -k %s' % (KC,rsa_cert_file,self.file)
+        os.system('%s import %s -P "" -k %s' % (KC,rsa_cert_file,self.filename))
 
-    #class methods
-    def convert_p12_to_pem(p12_file,pem_file):
-        return '%s pkcs12 -passin pass: -nodes -in %s -out %s' % (SSL,p12_file,pem_file)
+    #TODO: test
+    @classmethod
+    def convert_p12_to_pem(cls,p12_file,pem_file):
+        os.system('%s pkcs12 -passin pass: -nodes -in %s -out %s' % (SSL,p12_file,pem_file))
 
-    def generate_cert_request(email,country,rsa_file,cert_file):
-        return '%s req -new -key %s -out %s  -subj "/%s, CN=CERT_NAME, C=%s"' % (SSL,rsa_file,cert_file,email,country)
+    #TODO: test
+    @classmethod
+    def generate_cert_request(cls,email,country,rsa_file,cert_file):
+        os.system('%s req -new -key %s -out %s  -subj "/%s, CN=CERT_NAME, C=%s"' % (SSL,rsa_file,cert_file,email,country))
 
-    def generate_rsa_key(rsa_file, keysize=2048):
-        return '%s genrsa -out %s %s' % (SSL,rsa_file,keysize)
+    #TODO: test
+    @classmethod
+    def generate_rsa_key(cls,rsa_file, keysize=2048):
+        os.system('%s genrsa -out %s %s' % (SSL,rsa_file,keysize))
 
-    #TODO: fix
-    def keychain_files():
+    @classmethod
+    def keychain_files(cls):
         files = []
-        cmd = '%s list-keychains' % (KC,)
-        results = []
+        results = os.popen('%s list-keychains' % (KC,)).read().split('\n')
         for f in results:
-            files.append(f)
+            files.append(f.strip().replace('"',''))
         return files
