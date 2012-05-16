@@ -2,7 +2,7 @@ KC = 'security'
 SSL = 'openssl'
 
 class KeychainManager(object):
-    self.file = None
+    file = None
 
     def __init__(self,name):
         self.name = name
@@ -17,7 +17,7 @@ class KeychainManager(object):
     def exists(self):
         cmd = '%s list-keychains' % (KC,)
         result = ''
-        return self.name is in result
+        return self.name in result
 
     def export_identities(self,p12_file):
         return '%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.file,p12_file)
@@ -27,7 +27,7 @@ class KeychainManager(object):
             return self.file
         files = KeychainManager.keychain_files()
         for f in files:
-            if self.name is in f:
+            if self.name in f:
                 self.file = f
                 continue    
         return self.file
