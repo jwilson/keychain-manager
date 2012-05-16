@@ -22,7 +22,7 @@ class KeychainManager(object):
         return self.name in os.popen('%s list-keychains' % (KC,)).read()
 
     def export_identities(self,p12_file):
-        return '%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.filename,p12_file)
+        os.system('%s export -k %s -t identities -f pkcs12 -P "" -o %s' % (KC,self.filename,p12_file))
 
     def file(self):
         if self.filename:
